@@ -28,7 +28,12 @@ class TransaksiController extends Controller
             'tanggal_transaksi' => 'required|date',
         ]);
 
-        $produk = Produk::find($request->produk_id);
+        $produk = Produk::findOrFail($request->produk_id);
+
+        if ($request->jumlah > $produk->stok) {
+            return back()->withErrors(['jumlah' => 'Jumlah melebihi stok tersedia'])->withInput();
+        }
+
         $total = $produk->harga * $request->jumlah;
 
         Transaksi::create([
